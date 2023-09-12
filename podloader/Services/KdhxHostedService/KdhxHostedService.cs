@@ -31,14 +31,10 @@ namespace podloader.Services.KdhxHostedService
         private async void ExecuteTask(object state)
         {
             var now = DateTime.Now;
-            //var targetTime = new DateTime(now.Year, now.Month, now.Day, 5, 0, 0); // 5 AM today
+            // 5:00AM CDT and 10:00AM (UTC when it runs on the server)
+            var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
 
-            var targetTime = new DateTime(now.Year, now.Month, now.Day, 20, 0, 0); // 8:00pm UCT
-
-            _logger.LogInformation($"now: {now}");
-            _logger.LogInformation($"targetTime: {targetTime}");
-
-
+            _logger.LogInformation($"Current Time: {now} => Run Time: {targetTime}");
 
             // If the time is already past for today, look for 5 AM tomorrow
             if (now > targetTime)
@@ -59,8 +55,8 @@ namespace podloader.Services.KdhxHostedService
             _logger.LogInformation("KDHX Hosted Service is working.");
 
             // Check if the start date and end date are provided as command-line arguments, otherwise use yesterday's date until today.
-           var startDate = DateTime.Now.AddDays(-3);
-           var endDate = DateTime.Now.Date.AddSeconds(-1);
+            var startDate = DateTime.Now.AddDays(-3);
+            var endDate = DateTime.Now.Date.AddSeconds(-1);
 
 
             // Read the schedule from a JSON file
@@ -85,7 +81,7 @@ namespace podloader.Services.KdhxHostedService
             var tagging = new TaggingService();
             var searching = new SearchingService(schedule); // Replace with the actual path of your JSON file
             var downloading = new DownloadingService(schedule); // Pass the schedule to the DownloadingService
-     
+
 
             // Create a semaphore to limit concurrent downloads
             var semaphore = new SemaphoreSlim(10); // Set the maximum number of concurrent downloads (e.g., 10)
