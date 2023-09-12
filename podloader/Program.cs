@@ -90,7 +90,7 @@ app.MapGet("/podcast/kdhx", async () =>
     var response = new ContentResult
     {
         Content = xmlString,
-        ContentType = "application/rss+xml,
+        ContentType = "application/rss+xml",
         StatusCode = 200
     };
 
