@@ -1,10 +1,17 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using podloader;
 using podloader.Services.KdhxHostedService;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Text.Json;
+using System.Xml;
 using System.Xml.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,10 +23,9 @@ builder.Services.AddHostedService<KdhxHostedService>(provider => provider.GetReq
 
 var app = builder.Build();
 
-// Your existing endpoint
-app.MapGet("/", () => "Hello World!");
+// Your existing endpoints
+app.MapGet("/", () => "Fuck Off");
 
-// Additional endpoint for showing job status
 app.MapGet("/status", ([FromServices] KdhxHostedService service, [FromServices] ILogger<Program> logger) =>
 {
     var result = new
@@ -31,20 +37,11 @@ app.MapGet("/status", ([FromServices] KdhxHostedService service, [FromServices] 
     return JsonSerializer.Serialize(result);
 });
 
+var baseUrl = "http://podloader.kdhx.box.ca"; // Change this to your actual base URL
 
-string serverIPAddress = "192.168.1.20";
-int serverPort = 9876;
-var feedFullPath = "feed.rss";
-var audioRootUrl = $"http://{serverIPAddress}:{serverPort}";
-
-// Your existing podcast logic
 app.MapGet("/podcast/kdhx", async () =>
 {
-    // return podcast rss feed for path.combine("kdhxfiles", "*.mp3"), use a nuget to create the podcast response
-
-    var directory = Path.Combine("kdhxfiles");
-    var files = Directory.GetFiles(directory, "*.mp3");
-
+    // Create the RSS feed
     var rss = new Rss
     {
         Version = "2.0",
@@ -56,29 +53,71 @@ app.MapGet("/podcast/kdhx", async () =>
             Item = new List<Item>()
         }
     };
-    var allMp3s = new DirectoryInfo(directory)
-        .GetFiles("*.mp3", SearchOption.AllDirectories)
-        .OrderBy(x => x.Name);
 
-    foreach (var mp3 in allMp3s)
+    var directory = Path.Combine("kdhxfiles");
+    var audioFiles = Directory.GetFiles(directory, "*.mp3");
+
+    foreach (var mp3File in audioFiles)
     {
-        rss.Channel.Item.Add(new Item
+        var fileInfo = new FileInfo(mp3File);
+        var item = new Item
         {
-            Description = mp3.Name,
-            Title = mp3.Name,
+            Description = fileInfo.Name,
+            Title = fileInfo.Name,
             Enclosure = new Enclosure
             {
-                Url = $"{audioRootUrl}/{mp3.Name}",
-                Type = "audio/mpeg"
+                Url = $"{baseUrl}/audio/{fileInfo.Name}",
+                Type = "audio/mpeg",
+                Length = fileInfo.Length.ToString()
             }
-        });
-    }
-    var serializer = new XmlSerializer(typeof(Rss));
-    using (var writer = new StreamWriter(feedFullPath))
-    {
-        serializer.Serialize(writer, rss);
+        };
+        rss.Channel.Item.Add(item);
     }
 
+    // Serialize the RSS feed to XML
+    var serializer = new XmlSerializer(typeof(Rss));
+    var xmlString = "";
+    using (var writer = new StringWriter())
+    {
+        using (var xmlWriter = XmlWriter.Create(writer))
+        {
+            serializer.Serialize(xmlWriter, rss);
+            xmlString = writer.ToString();
+        }
+    }
+
+    // Set the response content type to XML
+    var response = new ContentResult
+    {
+        Content = xmlString,
+        ContentType = "application/xml",
+        StatusCode = 200
+    };
+
+    return response;
 });
+
+// New endpoint to serve MP3 files
+app.MapGet("/audio/{fileName}", async (HttpContext context) =>
+{
+    var fileName = context.Request.RouteValues["fileName"] as string;
+    var filePath = Path.Combine("kdhxfiles", fileName);
+
+    if (File.Exists(filePath))
+    {
+        var fileStream = File.OpenRead(filePath);
+
+        context.Response.ContentType = "audio/mpeg";
+        await fileStream.CopyToAsync(context.Response.Body);
+        fileStream.Close();
+    }
+    else
+    {
+        context.Response.StatusCode = StatusCodes.Status404NotFound;
+        await context.Response.WriteAsync("File not found");
+    }
+});
+
+
 
 app.Run();

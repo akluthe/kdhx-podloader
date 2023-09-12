@@ -16,6 +16,8 @@
         public string Url { get; set; }
         [XmlAttribute(AttributeName = "type")]
         public string Type { get; set; }
+        [XmlAttribute(AttributeName = "length")]
+        public string Length { get; set; }
     }
 
     [XmlRoot(ElementName = "item")]
