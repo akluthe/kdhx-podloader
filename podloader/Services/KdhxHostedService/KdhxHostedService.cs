@@ -35,6 +35,10 @@ namespace podloader.Services.KdhxHostedService
 
             var targetTime = new DateTime(now.Year, now.Month, now.Day, 8, 0, 0); // 8:00pm UCT
 
+            _logger.LogInformation($"now: {now}");
+            _logger.LogInformation($"targetTime: {targetTime}");
+
+
 
             // If the time is already past for today, look for 5 AM tomorrow
             if (now > targetTime)
