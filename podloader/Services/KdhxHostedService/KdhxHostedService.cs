@@ -33,7 +33,7 @@ namespace podloader.Services.KdhxHostedService
             var now = DateTime.Now;
             //var targetTime = new DateTime(now.Year, now.Month, now.Day, 5, 0, 0); // 5 AM today
 
-            var targetTime = new DateTime(now.Year, now.Month, now.Day, 8, 0, 0); // 8:00pm UCT
+            var targetTime = new DateTime(now.Year, now.Month, now.Day, 20, 0, 0); // 8:00pm UCT
 
             _logger.LogInformation($"now: {now}");
             _logger.LogInformation($"targetTime: {targetTime}");
