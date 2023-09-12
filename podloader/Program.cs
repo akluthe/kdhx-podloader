@@ -89,7 +89,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
     }
 
     // Set the response content type to XML
-    context.Response.ContentType = "application/rss+xml"; // Set content type to XML
+    context.Response.ContentType = "application/xml"; // Set content type to XML
     await context.Response.WriteAsync(xmlString);
 });
 
