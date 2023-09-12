@@ -12,7 +12,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "http://localhost:11720",
+      "applicationUrl": "http://dia.whatbox.ca:11720",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
@@ -21,7 +21,7 @@
       "commandName": "Project",
       "dotnetRunMessages": true,
       "launchBrowser": true,
-      "applicationUrl": "https://localhost:11721;http://localhost:11720",
+      "applicationUrl": "https://dia.whatbox.ca:11721;http://dia.whatbox.ca:11720",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
