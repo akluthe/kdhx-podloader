@@ -34,7 +34,7 @@ app.MapGet("/status", ([FromServices] KdhxHostedService service, [FromServices] 
 
 string serverIPAddress = "192.168.1.20";
 int serverPort = 9876;
-var feedFullPath = "/Temp/webroot/feed.rss";
+var feedFullPath = "feed.rss";
 var audioRootUrl = $"http://{serverIPAddress}:{serverPort}";
 
 // Your existing podcast logic
