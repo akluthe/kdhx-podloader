@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "HAQjMPC5xBUDDJaEp6RP2G+GGScabY/EdYJ3BeNgXxpClE8OJaMHIirQV5QiONf9ZqmAh9Wm/jsmpLtC64BqDg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\andre\\source\\repos\\podloader\\podloader\\podloader.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\andre\\.nuget\\packages\\taglib-sharp-netstandard2.0\\2.1.0\\taglib-sharp-netstandard2.0.2.1.0.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "uwPsHbjk+klrC29A4vBlAygA8n+ghFql8h6hqEZ+XMg=",
+  "Source": "podloader",
+  "BasePath": "_content/podloader",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
