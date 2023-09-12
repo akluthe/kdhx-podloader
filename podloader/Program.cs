@@ -39,7 +39,7 @@ app.MapGet("/status", ([FromServices] KdhxHostedService service, [FromServices] 
 
 var baseUrl = "http://podloader.kdhx.box.ca"; // Change this to your actual base URL
 
-app.MapGet("/podcast/kdhx", async () =>
+app.MapGet("/podcast/kdhx", async (HttpContext context) =>
 {
     // Create the RSS feed
     var rss = new Rss
@@ -60,6 +60,7 @@ app.MapGet("/podcast/kdhx", async () =>
     foreach (var mp3File in audioFiles)
     {
         var fileInfo = new FileInfo(mp3File);
+
         var item = new Item
         {
             Description = fileInfo.Name,
@@ -68,9 +69,10 @@ app.MapGet("/podcast/kdhx", async () =>
             {
                 Url = $"{baseUrl}/audio/{fileInfo.Name}",
                 Type = "audio/mpeg",
-                Length = fileInfo.Length.ToString()
+                Length = fileInfo.Length
             }
         };
+
         rss.Channel.Item.Add(item);
     }
 
@@ -87,15 +89,10 @@ app.MapGet("/podcast/kdhx", async () =>
     }
 
     // Set the response content type to XML
-    var response = new ContentResult
-    {
-        Content = xmlString,
-        ContentType = "application/rss+xml",
-        StatusCode = 200
-    };
-
-    return response;
+    context.Response.ContentType = "application/rss+xml"; // Set content type to XML
+    await context.Response.WriteAsync(xmlString);
 });
+
 
 // New endpoint to serve MP3 files
 app.MapGet("/audio/{fileName}", async (HttpContext context) =>
