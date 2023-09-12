@@ -31,7 +31,9 @@ namespace podloader.Services.KdhxHostedService
         private async void ExecuteTask(object state)
         {
             var now = DateTime.Now;
-            var targetTime = new DateTime(now.Year, now.Month, now.Day, 5, 0, 0); // 5 AM today
+            //var targetTime = new DateTime(now.Year, now.Month, now.Day, 5, 0, 0); // 5 AM today
+
+            var targetTime = new DateTime(now.Year, now.Month, now.Day, 8, 0, 0); // 8:00pm UCT
 
 
             // If the time is already past for today, look for 5 AM tomorrow
