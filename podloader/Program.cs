@@ -69,7 +69,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
             {
                 Url = $"{baseUrl}/audio/{fileInfo.Name}",
                 Type = "audio/mpeg",
-                Length = fileInfo.Length
+                Length = fileInfo.Length.ToString()
             }
         };
 
