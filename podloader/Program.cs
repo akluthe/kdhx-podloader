@@ -126,6 +126,7 @@ app.MapGet("/audio/{fileName}", async (HttpContext context) =>
         var fileStream = File.OpenRead(filePath);
 
         context.Response.ContentType = "audio/mpeg";
+        context.Response.ContentLength = fileStream.Length; // Set the content length
         await fileStream.CopyToAsync(context.Response.Body);
         fileStream.Close();
     }
@@ -135,6 +136,7 @@ app.MapGet("/audio/{fileName}", async (HttpContext context) =>
         await context.Response.WriteAsync("File not found");
     }
 });
+
 
 
 
