@@ -47,9 +47,22 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
         Version = "2.0",
         Channel = new Channel
         {
-            Title = "[Local] Test Podcast",
-            Description = "Testing generating RSS feed from local MP3 files",
-            Category = "test",
+            Title = "Your Podcast Title",
+            Link = "Your Podcast Link", // Set the link to your podcast's website
+            Description = "Your Podcast Description",
+            Language = "en-us", // Set the language code
+            PubDate = DateTime.Now.ToString("R"), // Set the publication date
+            LastBuildDate = DateTime.Now.ToString("R"), // Set the last build date
+            iTunesAuthor = "Your Podcast Author", // Set the author
+            iTunesKeywords = "Keywords, Separated, By, Commas", // Set keywords
+            iTunesExplicit = "no", // Set explicit content status
+            iTunesImage = new iTunesImage { Href = "Your Podcast Image URL" }, // Set the podcast image URL
+            iTunesOwner = new iTunesOwner
+            {
+                Name = "Your Name",
+                Email = "Your Email"
+            },
+            iTunesBlock = new iTunesBlock { Value = "no" }, // Set iTunes block status
             Item = new List<Item>()
         }
     };
@@ -63,14 +76,21 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
 
         var item = new Item
         {
-            Description = fileInfo.Name,
             Title = fileInfo.Name,
+            Description = fileInfo.Name, // Set episode description
+            PubDate = DateTime.Now.ToString("R"), // Set episode publication date
             Enclosure = new Enclosure
             {
                 Url = $"{baseUrl}/audio/{fileInfo.Name}",
                 Type = "audio/mpeg",
-                Length = fileInfo.Length.ToString()
-            }
+                Length = fileInfo.Length
+            },
+            Guid = Guid.NewGuid(), // Generate a unique GUID for the episode
+            iTunesAuthor = "Your Episode Author", // Set episode author
+            iTunesSubtitle = "Your Episode Subtitle", // Set episode subtitle
+            iTunesSummary = "Your Episode Summary", // Set episode summary
+            iTunesExplicit = "no", // Set episode explicit content status
+            iTunesDuration = "00:00:00" // Set episode duration (in the format HH:mm:ss)
         };
 
         rss.Channel.Item.Add(item);
@@ -92,6 +112,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
     context.Response.ContentType = "application/xml"; // Set content type to XML
     await context.Response.WriteAsync(xmlString);
 });
+
 
 
 // New endpoint to serve MP3 files
