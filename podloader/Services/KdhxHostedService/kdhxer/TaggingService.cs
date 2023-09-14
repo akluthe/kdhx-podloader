@@ -1,4 +1,8 @@
-﻿using System.Globalization;
+﻿using System;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Threading.Tasks;
 using System.Text.Json.Serialization;
 using System.Text.Json;
 
@@ -7,6 +11,8 @@ namespace podloader.Services.KdhxHostedService.kdhxer
     public class TaggingService
     {
         private readonly JsonSerializerOptions jsonOptions;
+        private readonly TimeZoneInfo cstTimeZone;
+
         public TaggingService()
         {
             // Configure JsonSerializerOptions to handle Enum as strings during deserialization
@@ -15,34 +21,30 @@ namespace podloader.Services.KdhxHostedService.kdhxer
                 Converters = { new JsonStringEnumConverter() },
                 PropertyNameCaseInsensitive = true
             };
+
+            cstTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
         }
 
-        //TODO: Improve this so it can tag the files with the current show maybe against the radio schedule
         public void TagMp3Files(string directory)
         {
-
-            //get all mp3 files in the directory
             var files = Directory.GetFiles(directory, "*.mp3").OrderBy(f => f).ToList();
 
             foreach (var file in files)
             {
-                //set title to Human Readable DateTime using the Filename in this format: 2023-04-11 00-00-02.mp3
                 var fileName = Path.GetFileNameWithoutExtension(file);
-                var dateTime = DateTimeOffset.ParseExact(fileName, "yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture).LocalDateTime;
+                if (DateTimeOffset.TryParseExact(fileName, "yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeOffset))
+                {
+                    var dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeOffset.UtcDateTime, cstTimeZone);
 
-                //set title as 12 hour time
-                SetTitle(file, dateTime.ToString("yyyy-MM-dd h:mm:ss tt"));
-
-                // set the Album to Kdhx and short Day of the Week and 4/1/23
-                SetAlbum(file, $"KDHX {dateTime:yyyy-MM-dd ddd}");
-
-                // set the Artist to the show Name
-                SetArtist(file, "KDHX DJ");
-
-                //SetDateTime(file, dateTime);
-
+                    SetTitle(file, dateTime.ToString("yyyy-MM-dd h:mm:ss tt"));
+                    SetAlbum(file, $"KDHX {dateTime:yyyy-MM-dd ddd}");
+                    SetArtist(file, "KDHX DJ");
+                }
+                else
+                {
+                    Console.WriteLine($"Could not parse the date-time from the filename {fileName}.");
+                }
             }
-
         }
 
         public async Task TagMp3File(string filePath)
@@ -50,16 +52,23 @@ namespace podloader.Services.KdhxHostedService.kdhxer
             try
             {
                 var fileName = Path.GetFileNameWithoutExtension(filePath);
-                var dateTime = DateTimeOffset.ParseExact(fileName, "yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture).LocalDateTime;
-
-                using (var tagFile = TagLib.File.Create(filePath))
+                if (DateTimeOffset.TryParseExact(fileName, "yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeOffset))
                 {
-                    tagFile.Tag.Album = $"KDHX {dateTime:yyyy-MM-dd ddd}";
-                    tagFile.Tag.Performers = new[] { "KDHX DJ" };
-                    tagFile.Tag.Title = dateTime.ToString("yyyy-MM-dd h:mm:ss tt");
-                    tagFile.Tag.Year = (uint)dateTime.Year;
+                    var dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeOffset.UtcDateTime, cstTimeZone);
 
-                    await Task.Run(() => tagFile.Save());
+                    using (var tagFile = TagLib.File.Create(filePath))
+                    {
+                        tagFile.Tag.Album = $"KDHX {dateTime:yyyy-MM-dd ddd}";
+                        tagFile.Tag.Performers = new[] { "KDHX DJ" };
+                        tagFile.Tag.Title = dateTime.ToString("yyyy-MM-dd h:mm:ss tt");
+                        tagFile.Tag.Year = (uint)dateTime.Year;
+
+                        await Task.Run(() => tagFile.Save());
+                    }
+                }
+                else
+                {
+                    Console.WriteLine($"Could not parse the date-time from the filename {fileName}.");
                 }
             }
             catch (Exception ex)
@@ -67,7 +76,6 @@ namespace podloader.Services.KdhxHostedService.kdhxer
                 Console.WriteLine($"Error tagging file {filePath}: {ex.Message}");
             }
         }
-
 
         public void SetTitle(string filePath, string title)
         {
@@ -89,8 +97,5 @@ namespace podloader.Services.KdhxHostedService.kdhxer
             mp3File.Tag.Album = album;
             mp3File.Save();
         }
-
-       
-
     }
 }
