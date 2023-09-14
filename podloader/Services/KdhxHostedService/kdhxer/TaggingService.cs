@@ -36,10 +36,10 @@ namespace podloader.Services.KdhxHostedService.kdhxer
                 {
                     var dateTime = dateTimeOffset.DateTime;
 
-                    SetTitle(file, dateTime.ToString("yyyy-MM-dd h:mm:ss tt"));
+                    SetTitle(file, dateTime.ToString("yyyy-MM-dd h:mm:ss tt ddd"));
                     SetAlbum(file, $"KDHX {dateTime:yyyy-MM-dd ddd}");
                     SetArtist(file, "KDHX DJ");
-                    Console.WriteLine($"Tagged {file} with {dateTime:yyyy-MM-dd h:mm:ss tt}");
+                    //Console.WriteLine($"Tagged {file} with {dateTime:yyyy-MM-dd h:mm:ss tt}");
                 }
                 else
                 {
