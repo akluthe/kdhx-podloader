@@ -65,7 +65,7 @@ namespace podloader.Services.KdhxHostedService
                 
 
             // Create a DateTime object for the end date in CST, which is current day till last second
-            var endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59);
+            var endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59).AddDays(-1);
       
             _logger.LogInformation($"Start Date: {startDate} => End Date: {endDate}");
 
