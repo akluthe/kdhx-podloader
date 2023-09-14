@@ -32,9 +32,9 @@ namespace podloader.Services.KdhxHostedService
         {
             var now = DateTime.Now;
             // 5:00AM CDT and 10:00AM (UTC when it runs on the server)
-            //var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
+            var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
 
-           var targetTime = now;
+           //var targetTime = now;
           
             _logger.LogDebug($"Current Time: {now} => Run Time: {targetTime}");
 
@@ -80,21 +80,21 @@ namespace podloader.Services.KdhxHostedService
             // Create a semaphore to limit concurrent downloads
             var semaphore = new SemaphoreSlim(10); // Set the maximum number of concurrent downloads (e.g., 10)
 
-            //try
-            //{
-            //    await foreach (var fileToDownload in searching.FindFiles(startDate, endDate))
-            //    {
-            //        // Start the download task for each file
-            //        await downloading.DownloadFiles(fileToDownload);
+            try
+            {
+                await foreach (var fileToDownload in searching.FindFiles(startDate, endDate))
+                {
+                    // Start the download task for each file
+                    await downloading.DownloadFiles(fileToDownload);
 
-            //        // Tag the downloaded file
-            //        //tagging.TagMp3File($@"H:\KDHX\{fileToDownload}.mp3");
-            //    }
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"Error: {ex.Message}");
-            //}
+                    // Tag the downloaded file
+                    //tagging.TagMp3File($@"H:\KDHX\{fileToDownload}.mp3");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+            }
 
             tagging.TagMp3Files(@"kdhxfiles"); // Replace with the actual path of your downloaded files
             IsJobRunning = false;
