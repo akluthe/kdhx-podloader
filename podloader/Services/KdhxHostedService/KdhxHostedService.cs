@@ -80,21 +80,21 @@ namespace podloader.Services.KdhxHostedService
             // Create a semaphore to limit concurrent downloads
             var semaphore = new SemaphoreSlim(10); // Set the maximum number of concurrent downloads (e.g., 10)
 
-            try
-            {
-                await foreach (var fileToDownload in searching.FindFiles(startDate, endDate))
-                {
-                    // Start the download task for each file
-                    await downloading.DownloadFiles(fileToDownload);
+            //try
+            //{
+            //    await foreach (var fileToDownload in searching.FindFiles(startDate, endDate))
+            //    {
+            //        // Start the download task for each file
+            //        await downloading.DownloadFiles(fileToDownload);
 
-                    // Tag the downloaded file
-                    //tagging.TagMp3File($@"H:\KDHX\{fileToDownload}.mp3");
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-            }
+            //        // Tag the downloaded file
+            //        //tagging.TagMp3File($@"H:\KDHX\{fileToDownload}.mp3");
+            //    }
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine($"Error: {ex.Message}");
+            //}
 
             tagging.TagMp3Files(@"kdhxfiles"); // Replace with the actual path of your downloaded files
             IsJobRunning = false;
