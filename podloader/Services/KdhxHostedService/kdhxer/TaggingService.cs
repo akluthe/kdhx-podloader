@@ -39,6 +39,7 @@ namespace podloader.Services.KdhxHostedService.kdhxer
                     SetTitle(file, dateTime.ToString("yyyy-MM-dd h:mm:ss tt"));
                     SetAlbum(file, $"KDHX {dateTime:yyyy-MM-dd ddd}");
                     SetArtist(file, "KDHX DJ");
+                    Console.WriteLine($"Tagged {file} with {dateTime:yyyy-MM-dd h:mm:ss tt}");
                 }
                 else
                 {
