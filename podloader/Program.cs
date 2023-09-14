@@ -1,20 +1,8 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using podloader;
 using podloader.Services.KdhxHostedService;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.IO;
-using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Text.Unicode;
-using System.Xml;
 using System.Xml.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -50,20 +38,20 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
         Version = "2.0",
         Channel = new Channel
         {
-            Title = "Your Podcast Title",
+            Title = "KDHX Radip",
             Link = "https://podloader.kdhx.box.ca/podcast/kdhx", // Set the link to your podcast's website
-            Description = "Your Podcast Description",
+            Description = "Radio Syndication",
             Language = "en-us", // Set the language code
             PubDate = DateTime.Now.ToString("R"), // Set the publication date
             LastBuildDate = DateTime.Now.ToString("R"), // Set the last build date
-            iTunesAuthor = "Your Podcast Author", // Set the author
-            iTunesKeywords = "Keywords, Separated, By, Commas", // Set keywords
+            iTunesAuthor = "KDHX", // Set the author
+            iTunesKeywords = "Radio, KDHX", // Set keywords
             iTunesExplicit = "no", // Set explicit content status
             iTunesImage = new iTunesImage { Href = "https://placehold.co/600x400" }, // Set the podcast image URL
             iTunesOwner = new iTunesOwner
             {
-                Name = "Your Name",
-                Email = "Your Email"
+                Name = "KDHX",
+
             },
             iTunesBlock = new iTunesBlock { Value = "no" }, // Set iTunes block status
             Item = new List<Item>()
@@ -77,23 +65,28 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
     {
         var fileInfo = new FileInfo(mp3File);
 
+        //read tags from mp3 file
+        var tagFile = TagLib.File.Create(mp3File);
+        var tag = tagFile.Tag;
+
+
         var item = new Item
         {
-            Title = fileInfo.Name,
-            Description = fileInfo.Name, // Set episode description
-            PubDate = DateTime.Now.ToString("R"), // Set episode publication date
+            Title = tag.Title,
+            Description = tag.Album, // Set episode description
+            PubDate = DateTime.Parse(fileInfo.Name).ToString("R"), // Set episode publication date from file name to "R" format
             Enclosure = new Enclosure
             {
                 Url = $"{baseUrl}/audio/{fileInfo.Name}",
                 Type = "audio/mpeg",
                 Length = fileInfo.Length
             },
-            Guid = $"{baseUrl}/audio/{fileInfo.Name}", // Generate a unique GUID for the episode
-            iTunesAuthor = "Your Episode Author", // Set episode author
-            iTunesSubtitle = "Your Episode Subtitle", // Set episode subtitle
-            iTunesSummary = "Your Episode Summary", // Set episode summary
+            Guid = $"{baseUrl}/audio/{fileInfo.Name}",
+            //iTunesAuthor = "Your Episode Author", // Set episode author
+            //iTunesSubtitle = "Your Episode Subtitle", // Set episode subtitle
+            //iTunesSummary = "Your Episode Summary", // Set episode summary
             iTunesExplicit = "no", // Set episode explicit content status
-            iTunesDuration = "00:00:00" // Set episode duration (in the format HH:mm:ss)
+            iTunesDuration = "01:00:00" // Set episode duration (in the format HH:mm:ss)
         };
 
         rss.Channel.Item.Add(item);
@@ -115,7 +108,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
 
         xmlString = Encoding.UTF8.GetString(memoryStream.ToArray());
     }
-   
+
 
 
     // Set the response content type to RSS

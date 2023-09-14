@@ -33,6 +33,8 @@ namespace podloader.Services.KdhxHostedService
             var now = DateTime.Now;
             // 5:00AM CDT and 10:00AM (UTC when it runs on the server)
             var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
+
+            //var targetTime = now;
           
             _logger.LogDebug($"Current Time: {now} => Run Time: {targetTime}");
 
@@ -43,7 +45,7 @@ namespace podloader.Services.KdhxHostedService
             }
 
             // Check if it's time to run the task
-            if ((targetTime - now).TotalMinutes <= 1)
+            if ((targetTime - now).TotalMinutes <= 1 && !IsJobRunning)
             {
                 await DoWork(CancellationToken.None);
             }
@@ -55,8 +57,10 @@ namespace podloader.Services.KdhxHostedService
             _logger.LogInformation("KDHX Hosted Service is working.");
 
             // Check if the start date and end date are provided as command-line arguments, otherwise use yesterday's date until today.
-            var startDate = DateTime.Now.AddDays(-3);
+            var startDate = DateTime.Now.Date.AddDays(-1);
             var endDate = DateTime.Now.Date.AddSeconds(-1);
+
+            _logger.LogInformation($"Start Date: {startDate} => End Date: {endDate}");
 
 
             // Read the schedule from a JSON file
