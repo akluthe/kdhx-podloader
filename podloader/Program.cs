@@ -97,11 +97,14 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
         rss.Channel.Item.Add(item);
     }
 
-    // Serialize the RSS feed to XML with UTF-8 encoding
+    // Serialize the RSS feed to XML
     var serializer = new XmlSerializer(typeof(Rss));
     var xmlString = "";
     using (var writer = new StringWriter())
     {
+        var xmlns = new XmlSerializerNamespaces();
+        xmlns.Add("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
+
         var settings = new XmlWriterSettings
         {
             Encoding = Encoding.UTF8 // Set the encoding to UTF-8
@@ -109,10 +112,6 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
 
         using (var xmlWriter = XmlWriter.Create(writer, settings))
         {
-            // Add the iTunes namespace declaration
-            var xmlns = new XmlSerializerNamespaces();
-            xmlns.Add("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
-
             serializer.Serialize(xmlWriter, rss, xmlns);
             xmlString = writer.ToString();
         }
@@ -122,6 +121,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
     context.Response.ContentType = "application/rss+xml";
     await context.Response.WriteAsync(xmlString);
 });
+
 
 
 
