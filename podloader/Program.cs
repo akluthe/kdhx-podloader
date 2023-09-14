@@ -8,10 +8,12 @@ using Microsoft.Extensions.Logging;
 using podloader;
 using podloader.Services.KdhxHostedService;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
+using System.Text.Unicode;
 using System.Xml;
 using System.Xml.Serialization;
 
@@ -100,23 +102,21 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
     // Serialize the RSS feed to XML
     var serializer = new XmlSerializer(typeof(Rss));
     var xmlString = "";
-    using (var writer = new StringWriter())
+
+    using (var memoryStream = new MemoryStream())
     {
-        var xmlns = new XmlSerializerNamespaces();
-        xmlns.Add("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
-        xmlns.Add("media", "http://search.yahoo.com/mrss/");
-
-        var settings = new XmlWriterSettings
+        using (var streamWriter = new StreamWriter(memoryStream, Encoding.UTF8))
         {
-            Encoding = Encoding.UTF8 // Set the encoding to UTF-8
-        };
+            var xmlns = new XmlSerializerNamespaces();
+            xmlns.Add("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
 
-        using (var xmlWriter = XmlWriter.Create(writer, settings))
-        {
-            serializer.Serialize(xmlWriter, rss, xmlns);  // passing the namespaces here
-            xmlString = writer.ToString();
+            serializer.Serialize(streamWriter, rss, xmlns);
         }
+
+        xmlString = Encoding.UTF8.GetString(memoryStream.ToArray());
     }
+   
+
 
     // Set the response content type to RSS
     context.Response.ContentType = "application/rss+xml";
