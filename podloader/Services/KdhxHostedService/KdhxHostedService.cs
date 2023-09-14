@@ -56,36 +56,25 @@ namespace podloader.Services.KdhxHostedService
             IsJobRunning = true;
             _logger.LogInformation("KDHX Hosted Service is working.");
 
-            // Check if the start date and end date are provided as command-line arguments, otherwise use yesterday's date until today.
-            var startDate = DateTime.Now.Date.AddDays(-1);
-            var endDate = DateTime.Now.Date.AddSeconds(-1);
+            // Get current time in CST
+            TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+            DateTime nowCst = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
+
+            // Create a DateTime object for the start date in CST, which is one day behind
+            DateTime startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0, DateTimeKind.Unspecified).AddDays(-1);
+
+            // Create a DateTime object for the end date in CST, which is current day till last second
+            DateTime endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59, DateTimeKind.Unspecified);
 
             _logger.LogInformation($"Start Date: {startDate} => End Date: {endDate}");
-
 
             // Read the schedule from a JSON file
             var scheduleReader = new ScheduleReader("schedule.json");
             var schedule = scheduleReader.ReadSchedule();
 
-            /*
-
-            Figure out how to iterate through each day, and find the first file that exists.
-
-            Then scan forward 1 hour + or - 5 minutes to see if the next file exists.
-
-            Check for the next file 1 hour + or - 5 minutes after that.
-
-            Proceed until you have 24 hours of files.
-
-            $"https://kdhx.org/archive/files/{currentTimestamp}.mp3";
-
-            */
-
-            // Read from a JSON file that has the times and days of the week that have the shows I want to download.
             var tagging = new TaggingService();
-            var searching = new SearchingService(schedule); // Replace with the actual path of your JSON file
-            var downloading = new DownloadingService(schedule); // Pass the schedule to the DownloadingService
-
+            var searching = new SearchingService(schedule);
+            var downloading = new DownloadingService(schedule);
 
             // Create a semaphore to limit concurrent downloads
             var semaphore = new SemaphoreSlim(10); // Set the maximum number of concurrent downloads (e.g., 10)
@@ -100,7 +89,6 @@ namespace podloader.Services.KdhxHostedService
                     // Tag the downloaded file
                     //tagging.TagMp3File($@"H:\KDHX\{fileToDownload.fileName}.mp3");
                 }
-
             }
             catch (Exception ex)
             {
@@ -109,9 +97,9 @@ namespace podloader.Services.KdhxHostedService
 
             tagging.TagMp3Files(@"kdhxfiles"); // Replace with the actual path of your downloaded files
             IsJobRunning = false;
-
-
         }
+
+
 
         public Task StopAsync(CancellationToken cancellationToken)
         {
