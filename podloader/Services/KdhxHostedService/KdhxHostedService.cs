@@ -60,11 +60,14 @@ namespace podloader.Services.KdhxHostedService
             TimeZoneInfo cstZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
             DateTime nowCst = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
 
-            // Create a DateTime object for the start date in CST, which is one day behind
+            // Create a DateTime object for the start date in CST, which is one day behind and set to midnight
             DateTime startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0, DateTimeKind.Unspecified).AddDays(-1);
+            startDate = TimeZoneInfo.ConvertTimeFromUtc(startDate.ToUniversalTime(), cstZone).Date;
 
             // Create a DateTime object for the end date in CST, which is current day till last second
             DateTime endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59, DateTimeKind.Unspecified);
+            endDate = TimeZoneInfo.ConvertTimeFromUtc(endDate.ToUniversalTime(), cstZone);
+            endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day, 23, 59, 59);
 
             _logger.LogInformation($"Start Date: {startDate} => End Date: {endDate}");
 
@@ -98,6 +101,7 @@ namespace podloader.Services.KdhxHostedService
             tagging.TagMp3Files(@"kdhxfiles"); // Replace with the actual path of your downloaded files
             IsJobRunning = false;
         }
+
 
 
 
