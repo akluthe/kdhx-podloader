@@ -104,6 +104,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
     {
         var xmlns = new XmlSerializerNamespaces();
         xmlns.Add("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
+        xmlns.Add("media", "http://search.yahoo.com/mrss/");
 
         var settings = new XmlWriterSettings
         {
@@ -112,13 +113,13 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
 
         using (var xmlWriter = XmlWriter.Create(writer, settings))
         {
-            serializer.Serialize(xmlWriter, rss, xmlns);
+            serializer.Serialize(xmlWriter, rss, xmlns);  // passing the namespaces here
             xmlString = writer.ToString();
         }
     }
 
     // Set the response content type to RSS
-    context.Response.ContentType = "application/xml";
+    context.Response.ContentType = "application/rss+xml";
     await context.Response.WriteAsync(xmlString);
 });
 
