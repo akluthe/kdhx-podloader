@@ -45,7 +45,7 @@ namespace podloader.Services.KdhxHostedService.kdhxer
                 var httpClient = new HttpClient(httpClientHandler);
                 httpClient.DefaultRequestHeaders.ConnectionClose = false;
 
-                Console.WriteLine($"Searching Day {ConvertUnixToCST((long)(current - new DateTime(1970, 1, 1)).TotalSeconds)}");
+                Console.WriteLine($"Searching Day {current}");
 
                 var secondsToSearch = GenerateFirstHourSearch(current);
                 var firstFile = await CheckFileBySecondAsync(httpClient, secondsToSearch[0], secondsToSearch[secondsToSearch.Count - 1]);

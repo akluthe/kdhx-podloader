@@ -61,14 +61,12 @@ namespace podloader.Services.KdhxHostedService
             DateTime nowCst = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
 
             // Create a DateTime object for the start date in CST, which is one day behind and set to midnight
-            DateTime startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0, DateTimeKind.Unspecified).AddDays(-1);
-            startDate = TimeZoneInfo.ConvertTimeFromUtc(startDate.ToUniversalTime(), cstZone).Date;
+            var startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0).AddDays(-1);
+                
 
             // Create a DateTime object for the end date in CST, which is current day till last second
-            DateTime endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59, DateTimeKind.Unspecified);
-            endDate = TimeZoneInfo.ConvertTimeFromUtc(endDate.ToUniversalTime(), cstZone);
-            endDate = new DateTime(endDate.Year, endDate.Month, endDate.Day, 23, 59, 59);
-
+            var endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59);
+      
             _logger.LogInformation($"Start Date: {startDate} => End Date: {endDate}");
 
             // Read the schedule from a JSON file
