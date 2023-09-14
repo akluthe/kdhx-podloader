@@ -10,15 +10,13 @@ namespace podloader.Services.KdhxHostedService
     public class KdhxHostedService : IHostedService, IDisposable
     {
         private readonly ILogger<KdhxHostedService> _logger;
-        private readonly IServiceProvider _serviceProvider;
         private Timer _timer;
 
         public bool IsJobRunning { get; private set; } = false;
 
-        public KdhxHostedService(ILogger<KdhxHostedService> logger, IServiceProvider serviceProvider)
+        public KdhxHostedService(ILogger<KdhxHostedService> logger)
         {
             _logger = logger;
-            _serviceProvider = serviceProvider;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -32,10 +30,10 @@ namespace podloader.Services.KdhxHostedService
         {
             var now = DateTime.Now;
             // 5:00AM CDT and 10:00AM (UTC when it runs on the server)
-            var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
+            //var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
 
-           //var targetTime = now;
-          
+            var targetTime = now;
+
             _logger.LogDebug($"Current Time: {now} => Run Time: {targetTime}");
 
             // If the time is already past for today, look for 5 AM tomorrow
@@ -61,24 +59,19 @@ namespace podloader.Services.KdhxHostedService
             DateTime nowCst = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
 
             // Create a DateTime object for the start date in CST, which is one day behind and set to midnight
-            var startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0).AddDays(-1);
-                
+            var startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0).AddDays(-4);
 
             // Create a DateTime object for the end date in CST, which is current day till last second
             var endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59).AddDays(-1);
-      
+
             _logger.LogInformation($"Start Date: {startDate} => End Date: {endDate}");
 
             // Read the schedule from a JSON file
             var scheduleReader = new ScheduleReader("schedule.json");
             var schedule = scheduleReader.ReadSchedule();
 
-            var tagging = new TaggingService();
             var searching = new SearchingService(schedule);
             var downloading = new DownloadingService(schedule);
-
-            // Create a semaphore to limit concurrent downloads
-            var semaphore = new SemaphoreSlim(10); // Set the maximum number of concurrent downloads (e.g., 10)
 
             try
             {
@@ -86,9 +79,6 @@ namespace podloader.Services.KdhxHostedService
                 {
                     // Start the download task for each file
                     await downloading.DownloadFiles(fileToDownload);
-
-                    // Tag the downloaded file
-                    //tagging.TagMp3File($@"H:\KDHX\{fileToDownload}.mp3");
                 }
             }
             catch (Exception ex)
@@ -96,12 +86,9 @@ namespace podloader.Services.KdhxHostedService
                 Console.WriteLine($"Error: {ex.Message}");
             }
 
-            tagging.TagMp3Files(@"kdhxfiles"); // Replace with the actual path of your downloaded files
+
             IsJobRunning = false;
         }
-
-
-
 
         public Task StopAsync(CancellationToken cancellationToken)
         {

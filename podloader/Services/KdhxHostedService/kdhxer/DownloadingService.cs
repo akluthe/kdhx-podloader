@@ -59,6 +59,7 @@ namespace podloader.Services.KdhxHostedService.kdhxer
         {
             try
             {
+                var tagging = new TaggingService();
                 var cstTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
                 var readableFileName = TimeZoneInfo.ConvertTimeFromUtc(DateTimeOffset.FromUnixTimeSeconds(fileName).UtcDateTime, cstTimeZone).ToString("yyyy-MM-dd HH-mm-ss");
 
@@ -92,6 +93,8 @@ namespace podloader.Services.KdhxHostedService.kdhxer
                     {
                         await stream.CopyToAsync(fileStream);
                     }
+
+                    tagging.TagMp3File(diskFileName);
                 }
                 else
                 {

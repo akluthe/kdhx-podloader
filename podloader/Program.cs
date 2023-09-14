@@ -10,7 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add hosted service and logging
 builder.Services.AddLogging(builder => builder.AddConsole());
 builder.Services.AddSingleton<KdhxHostedService>(); // Register as singleton
-builder.Services.AddHostedService<KdhxHostedService>(provider => provider.GetRequiredService<KdhxHostedService>());
+builder.Services.AddHostedService(provider => provider.GetRequiredService<KdhxHostedService>());
 
 var app = builder.Build();
 
