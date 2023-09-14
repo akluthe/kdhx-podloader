@@ -34,7 +34,7 @@ namespace podloader.Services.KdhxHostedService.kdhxer
                 var fileName = Path.GetFileNameWithoutExtension(file);
                 if (DateTimeOffset.TryParseExact(fileName, "yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeOffset))
                 {
-                    var dateTime = TimeZoneInfo.ConvertTimeFromUtc(dateTimeOffset.UtcDateTime, cstTimeZone);
+                    var dateTime = dateTimeOffset.DateTime;
 
                     SetTitle(file, dateTime.ToString("yyyy-MM-dd h:mm:ss tt"));
                     SetAlbum(file, $"KDHX {dateTime:yyyy-MM-dd ddd}");
