@@ -56,7 +56,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
             iTunesAuthor = "Your Podcast Author", // Set the author
             iTunesKeywords = "Keywords, Separated, By, Commas", // Set keywords
             iTunesExplicit = "no", // Set explicit content status
-            iTunesImage = new iTunesImage { Href = "Your Podcast Image URL" }, // Set the podcast image URL
+            iTunesImage = new iTunesImage { Href = "https://placehold.co/600x400" }, // Set the podcast image URL
             iTunesOwner = new iTunesOwner
             {
                 Name = "Your Name",
