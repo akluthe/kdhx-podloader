@@ -124,11 +124,6 @@ namespace podloader
         [XmlAttribute(AttributeName = "version")]
         public string Version { get; set; }
 
-        [XmlAttribute(AttributeName = "xmlns:itunes")]
-        public string iTunesNamespace { get; set; } = "http://www.itunes.com/dtds/podcast-1.0.dtd";
-
-        [XmlAttribute(AttributeName = "xmlns:media")]
-        public string MediaNamespace { get; set; } = "http://search.yahoo.com/mrss/";
 
         [XmlElement(ElementName = "channel")]
         public Channel Channel { get; set; }
