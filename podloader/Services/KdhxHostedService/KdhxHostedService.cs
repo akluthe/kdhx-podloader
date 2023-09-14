@@ -30,9 +30,9 @@ namespace podloader.Services.KdhxHostedService
         {
             var now = DateTime.Now;
             // 5:00AM CDT and 10:00AM (UTC when it runs on the server)
-            //var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
+            var targetTime = new DateTime(now.Year, now.Month, now.Day, 10, 0, 0);
 
-            var targetTime = now;
+            //var targetTime = now;
 
             _logger.LogDebug($"Current Time: {now} => Run Time: {targetTime}");
 
@@ -59,7 +59,7 @@ namespace podloader.Services.KdhxHostedService
             DateTime nowCst = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, cstZone);
 
             // Create a DateTime object for the start date in CST, which is one day behind and set to midnight
-            var startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0).AddDays(-4);
+            var startDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 0, 0, 0).AddDays(-1);
 
             // Create a DateTime object for the end date in CST, which is current day till last second
             var endDate = new DateTime(nowCst.Year, nowCst.Month, nowCst.Day, 23, 59, 59).AddDays(-1);

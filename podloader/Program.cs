@@ -28,6 +28,18 @@ app.MapGet("/status", ([FromServices] KdhxHostedService service, [FromServices] 
     return JsonSerializer.Serialize(result);
 });
 
+app.MapGet("/status/dowork", async ([FromServices] KdhxHostedService service, [FromServices] ILogger<Program> logger) =>
+{
+    await service.DoWork(CancellationToken.None);
+
+    var result = new
+    {
+        IsJobRunning = service.IsJobRunning
+    };
+
+    logger.LogInformation("dowork endpoint was accessed.");
+});
+
 var baseUrl = "http://podloader.kdhx.box.ca"; // Change this to your actual base URL
 
 app.MapGet("/podcast/kdhx", async (HttpContext context) =>
