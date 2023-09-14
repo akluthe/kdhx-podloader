@@ -38,7 +38,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
         Version = "2.0",
         Channel = new Channel
         {
-            Title = "KDHX Radip",
+            Title = "KDHX Radio",
             Link = "https://podloader.kdhx.box.ca/podcast/kdhx", // Set the link to your podcast's website
             Description = "Radio Syndication",
             Language = "en-us", // Set the language code
@@ -72,9 +72,9 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
 
         var item = new Item
         {
-            Title = tag.Title,
+            Title = tag.Album,
             Description = tag.Album, // Set episode description
-            PubDate = DateTime.Parse(fileInfo.Name).ToString("R"), // Set episode publication date from file name to "R" format
+            PubDate = DateTime.Parse(tag.Title).ToString("R"), // Set episode publication date from file name to "R" format
             Enclosure = new Enclosure
             {
                 Url = $"{baseUrl}/audio/{fileInfo.Name}",
