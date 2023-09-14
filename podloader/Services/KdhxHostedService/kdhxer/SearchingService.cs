@@ -149,7 +149,7 @@ namespace podloader.Services.KdhxHostedService.kdhxer
             }
 
             // For debugging: print the list of Unix seconds
-            Console.WriteLine(string.Join(", ", unixSeconds));
+            Console.WriteLine(unixSeconds.FirstOrDefault());
 
             return unixSeconds;
         }
