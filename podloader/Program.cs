@@ -10,6 +10,7 @@ using podloader.Services.KdhxHostedService;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Text;
 using System.Text.Json;
 using System.Xml;
 using System.Xml.Serialization;
@@ -96,19 +97,28 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
         rss.Channel.Item.Add(item);
     }
 
-    // Serialize the RSS feed to XML
+    // Serialize the RSS feed to XML with UTF-8 encoding
     var serializer = new XmlSerializer(typeof(Rss));
     var xmlString = "";
     using (var writer = new StringWriter())
     {
-        using (var xmlWriter = XmlWriter.Create(writer))
+        var settings = new XmlWriterSettings
         {
-            serializer.Serialize(xmlWriter, rss);
+            Encoding = Encoding.UTF8 // Set the encoding to UTF-8
+        };
+
+        using (var xmlWriter = XmlWriter.Create(writer, settings))
+        {
+            // Add the iTunes namespace declaration
+            var xmlns = new XmlSerializerNamespaces();
+            xmlns.Add("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd");
+
+            serializer.Serialize(xmlWriter, rss, xmlns);
             xmlString = writer.ToString();
         }
     }
 
-    // Set the response content type to rss
+    // Set the response content type to RSS
     context.Response.ContentType = "application/rss+xml";
     await context.Response.WriteAsync(xmlString);
 });
