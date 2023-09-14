@@ -48,7 +48,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
         Channel = new Channel
         {
             Title = "Your Podcast Title",
-            Link = "Your Podcast Link", // Set the link to your podcast's website
+            Link = "https://podloader.kdhx.box.ca/podcast/kdhx", // Set the link to your podcast's website
             Description = "Your Podcast Description",
             Language = "en-us", // Set the language code
             PubDate = DateTime.Now.ToString("R"), // Set the publication date
@@ -85,7 +85,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
                 Type = "audio/mpeg",
                 Length = fileInfo.Length
             },
-            Guid = Guid.NewGuid(), // Generate a unique GUID for the episode
+            Guid = $"{baseUrl}/audio/{fileInfo.Name}", // Generate a unique GUID for the episode
             iTunesAuthor = "Your Episode Author", // Set episode author
             iTunesSubtitle = "Your Episode Subtitle", // Set episode subtitle
             iTunesSummary = "Your Episode Summary", // Set episode summary

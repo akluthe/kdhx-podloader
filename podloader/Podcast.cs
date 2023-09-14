@@ -57,7 +57,7 @@ namespace podloader
         public Enclosure Enclosure { get; set; }
 
         [XmlElement(ElementName = "guid")]
-        public Guid Guid { get; set; }
+        public string Guid { get; set; }
 
         [XmlElement(ElementName = "itunes:author", Namespace = "http://www.itunes.com/dtds/podcast-1.0.dtd")]
         public string iTunesAuthor { get; set; }
