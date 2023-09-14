@@ -121,10 +121,16 @@ namespace podloader
     [XmlRoot(ElementName = "rss")]
     public class Rss
     {
+        [XmlAttribute(AttributeName = "version")]
+        public string Version { get; set; }
+
+        [XmlAttribute(AttributeName = "itunes", Namespace = "http://www.w3.org/2000/xmlns/")]
+        public string iTunesNamespace = "http://www.itunes.com/dtds/podcast-1.0.dtd";
+
+        [XmlAttribute(AttributeName = "media", Namespace = "http://www.w3.org/2000/xmlns/")]
+        public string MediaNamespace = "http://search.yahoo.com/mrss/";
+
         [XmlElement(ElementName = "channel")]
         public Channel Channel { get; set; }
-
-        [XmlAttribute(AttributeName = "version")]
-        public string Version { get; set; } = "2.0";
     }
 }
