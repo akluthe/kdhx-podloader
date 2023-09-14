@@ -69,12 +69,16 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
         var tagFile = TagLib.File.Create(mp3File);
         var tag = tagFile.Tag;
 
+        //parse the title into a date (inferring the file is CST)
+        var date = DateTime.Parse(tag.Title).ToUniversalTime();
+        
+
 
         var item = new Item
         {
             Title = tag.Title,
             Description = tag.Album, // Set episode description
-            PubDate = DateTime.Parse(tag.Title).ToString("R"), // Set episode publication date from file name to "R" format
+            PubDate = date.ToString("R"), // Set episode publication date from file name to "R" format
             Enclosure = new Enclosure
             {
                 Url = $"{baseUrl}/audio/{fileInfo.Name}",
