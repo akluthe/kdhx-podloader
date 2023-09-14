@@ -12,6 +12,7 @@ namespace podloader.Services.KdhxHostedService.kdhxer
     {
         private readonly JsonSerializerOptions jsonOptions;
         private readonly TimeZoneInfo cstTimeZone;
+    
 
         public TaggingService()
         {
@@ -23,6 +24,8 @@ namespace podloader.Services.KdhxHostedService.kdhxer
             };
 
             cstTimeZone = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
+
+       
         }
 
         public void TagMp3Files(string directory)
@@ -48,24 +51,19 @@ namespace podloader.Services.KdhxHostedService.kdhxer
             }
         }
 
-        public async Task TagMp3File(string filePath)
+        public void TagMp3File(string file)
         {
             try
             {
-                var fileName = Path.GetFileNameWithoutExtension(filePath);
+                var fileName = Path.GetFileNameWithoutExtension(file);
                 if (DateTimeOffset.TryParseExact(fileName, "yyyy-MM-dd HH-mm-ss", CultureInfo.InvariantCulture, DateTimeStyles.None, out var dateTimeOffset))
                 {
                     var dateTime = dateTimeOffset.DateTime;
 
-                    using (var tagFile = TagLib.File.Create(filePath))
-                    {
-                        tagFile.Tag.Album = $"KDHX {dateTime:yyyy-MM-dd ddd}";
-                        tagFile.Tag.Performers = new[] { "KDHX DJ" };
-                        tagFile.Tag.Title = dateTime.ToString("yyyy-MM-dd h:mm:ss tt");
-                        tagFile.Tag.Year = (uint)dateTime.Year;
-
-                        await Task.Run(() => tagFile.Save());
-                    }
+                    SetTitle(file, dateTime.ToString("yyyy-MM-dd h:mm:ss tt ddd"));
+                    SetAlbum(file, $"KDHX {dateTime:yyyy-MM-dd ddd}");
+                    SetArtist(file, "KDHX DJ");
+                    //Console.WriteLine($"Tagged {file} with {dateTime:yyyy-MM-dd h:mm:ss tt}");
                 }
                 else
                 {
@@ -74,7 +72,7 @@ namespace podloader.Services.KdhxHostedService.kdhxer
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error tagging file {filePath}: {ex.Message}");
+                Console.WriteLine($"Error tagging file {file}: {ex.Message}");
             }
         }
 
