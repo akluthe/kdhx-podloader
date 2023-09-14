@@ -72,7 +72,7 @@ app.MapGet("/podcast/kdhx", async (HttpContext context) =>
 
         var item = new Item
         {
-            Title = tag.Album,
+            Title = tag.Title,
             Description = tag.Album, // Set episode description
             PubDate = DateTime.Parse(tag.Title).ToString("R"), // Set episode publication date from file name to "R" format
             Enclosure = new Enclosure
