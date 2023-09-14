@@ -130,24 +130,26 @@ namespace podloader.Services.KdhxHostedService.kdhxer
 
         public List<long> GenerateFirstHourSearch(DateTime startDate)
         {
-            // Generate a list of all unix Seconds between 00:00:00 and 01:00:00 CST
             // Set the time zone to Central Standard Time (CST)
             TimeZoneInfo cst = TimeZoneInfo.FindSystemTimeZoneById("Central Standard Time");
 
-            // Create the start and end times in CST
-            DateTime start = TimeZoneInfo.ConvertTime(new DateTime(startDate.Year, startDate.Month, startDate.Day, 0, 0, 0, DateTimeKind.Utc), cst);
-            DateTime end = start.AddHours(1);
+            // Create the start and end times as midnight and 01:00:00 in CST, and leave it unspecified
+            DateTime startCst = new DateTime(startDate.Year, startDate.Month, startDate.Day, 0, 0, 0, DateTimeKind.Unspecified);
+            DateTime endCst = startCst.AddHours(1);
 
-            // Convert the start and end times to UTC
-            start = TimeZoneInfo.ConvertTimeToUtc(start, cst);
-            end = TimeZoneInfo.ConvertTimeToUtc(end, cst);
+            // Convert the CST times to UTC
+            DateTime startUtc = TimeZoneInfo.ConvertTimeToUtc(startCst, cst);
+            DateTime endUtc = TimeZoneInfo.ConvertTimeToUtc(endCst, cst);
 
             // Generate the list of Unix seconds
             List<long> unixSeconds = new List<long>();
-            for (DateTime current = start; current < end; current = current.AddSeconds(1))
+            for (DateTime current = startUtc; current < endUtc; current = current.AddSeconds(1))
             {
                 unixSeconds.Add((long)(current - new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc)).TotalSeconds);
             }
+
+            // For debugging: print the list of Unix seconds
+            Console.WriteLine(string.Join(", ", unixSeconds));
 
             return unixSeconds;
         }
